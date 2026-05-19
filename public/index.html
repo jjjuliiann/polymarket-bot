@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>
+AI Trading Terminal
+</title>
+
+<style>
+
+body {
+
+background:
+#07122b;
+
+color:
+white;
+
+font-family:
+Arial;
+
+padding:
+20px;
+}
+
+.grid {
+
+display:
+grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(420px,1fr));
+
+gap:
+20px;
+}
+
+.card {
+
+background:
+#172544;
+
+padding:
+20px;
+
+border-radius:
+16px;
+}
+
+.box {
+
+background:
+#22345f;
+
+padding:
+12px;
+
+border-radius:
+10px;
+
+margin-bottom:
+10px;
+}
+
+.buy {
+
+color:
+#00ff99;
+}
+
+.sell {
+
+color:
+#ff5b5b;
+}
+
+.pnlPositive {
+
+color:
+#00ff99;
+}
+
+.pnlNegative {
+
+color:
+#ff5b5b;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+🧠 AI Trading Terminal
+</h1>
+
+<div
+class="grid"
+id="app">
+</div>
+
+<script>
+
+async function load() {
+
+const res =
+await fetch(
+"/api/scanner"
+);
+
+const data =
+await res.json();
+
+const app =
+document.getElementById(
+"app"
+);
+
+app.innerHTML = "";
+
+data.forEach(m => {
+
+let signalClass =
+"buy";
+
+if (
+m.signal.includes(
+"SELL"
+)
+) {
+
+signalClass =
+"sell";
+}
+
+let pnlClass =
+"pnlPositive";
+
+if (
+parseFloat(m.pnl) < 0
+) {
+
+pnlClass =
+"pnlNegative";
+}
+
+app.innerHTML += `
+
+<div class="card">
+
+<h2>
+${m.question}
+</h2>
+
+<div class="box">
+ENTRY:
+${m.entry}
+</div>
+
+<div class="box">
+CURRENT:
+${m.price}
+</div>
+
+<div class="box">
+CONFIDENCE:
+${m.confidence.toFixed(1)}%
+</div>
+
+<div class="box">
+WHALE BUY:
+${m.whaleBuy.toFixed(1)}%
+</div>
+
+<div class="box ${signalClass}">
+SIGNAL:
+${m.signal}
+</div>
+
+<div class="box ${pnlClass}">
+PnL:
+${m.pnl}%
+</div>
+
+<div class="box">
+${m.aiCommentary}
+</div>
+
+</div>
+`;
+});
+}
+
+load();
+
+setInterval(
+load,
+5000
+);
+
+</script>
+
+</body>
+
+</html>
